@@ -2,18 +2,20 @@ package xyz.yuelai.rederer;
 
 import java.util.regex.Matcher;
 
+/**
+ * 空白行渲染器
+ */
 public class BlankLineRenderer implements MDRenderer {
 
-    private static final String replacement = "<p>&nbsp;</p>\n";
+    private final String REPLACEMENT = "<p>&nbsp;</p>\n";
+    private StringBuffer result = new StringBuffer();
 
     @Override
     public String render(Matcher matcher) {
-        String result = null;
         while (matcher.find()) {
-            String s = matcher.replaceFirst(replacement);
-            matcher.reset(s);
-            result = s;
+            matcher.appendReplacement(result,REPLACEMENT);
         }
-        return result;
+        matcher.appendTail(result);
+        return result.toString();
     }
 }

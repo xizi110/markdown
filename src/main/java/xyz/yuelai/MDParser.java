@@ -6,27 +6,35 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * markdown文本解析器，使用正则表达式对markdown文本进行解析
+ * 将解析后得到的markdown标签传递给对应标签的渲染器进行渲染
+ *
+ */
 public class MDParser {
 
-    public static final Map<Class<? extends MDRenderer>, String> regex = new HashMap<Class<? extends MDRenderer>, String>(){{
+    /**
+     * 各种标签的(渲染器-正则表达式)键值对
+     */
+    private static final Map<Class<? extends MDRenderer>, String> regex = new HashMap<Class<? extends MDRenderer>, String>(){{
 
-        /**
+        /*
          * H1~H6标题，"### 标题3"或"### 标题3 ###"
          */
         put(HeadingRenderer.class, "^ *(#{1,6}) +\\S*( +)*\\1?$");
 
-        /**
+        /*
          * 空白行，一次回车一个空白行
          */
         put(BlankLineRenderer.class, "^\\n");
 
-        /**
+        /*
          * 行内代码块，嵌入文本中
          * 这是行内的代码`hello`或者是这样```hello```,都算是行内代码块
          */
-        put(InlineCodeRenderer.class, "(`{1,}).*([^\\n]+?)([^\\n])\\1");
+        put(InlineCodeRenderer.class, "(`{1,}).+([^\\n]+?)([^\\n])\\1");
 
-        /**
+        /*
          *  块状代码块，需开新行
          *  ```
          *     public static void main(){
@@ -34,18 +42,25 @@ public class MDParser {
          *    }
          *  ```
          */
-        put(BlockCodeRenderer.class, "(^`{3,})([\\s\\S]*?)\\1");
+        put(BlockCodeRenderer.class, "^(`{3,})([\\s\\S]*?)\\1$");
 
-        /**
+        /*
          * a链接，暂不支持指定跳转方式
+         * 由于和图片链接很相似，所以多向前包含一位，作为区分位
          */
-        put(LinkRenderer.class, "(\\[.+]\\([^)]+\\))");
+        put(LinkRenderer.class, ".?(\\[.+\\]\\([^)]+\\))");
 
-        /**
+        /*
          * 普通图片<img src=""/> =====> ![]()
          * 链接图片<a href=""><img src=""/></a>  =====> [![]()]()
          */
         put(ImageLinkRenderer.class, "(\\[? *!\\[([^\\]])*\\]\\(([^\\)])*\\) *\\]?(\\([^\\)]*\\))?)");
+
+        /*
+         * 水平线，简陋匹配，在renderer中需要详细检查
+         * *** 或 --- 或 * * * 或 - - -
+         */
+        put(HorizontalRenderer.class, "^(\\*|\\-)[\\* *\\-]{2,}$");
     }};
 
     /**
@@ -70,9 +85,7 @@ public class MDParser {
                 String rendered = renderer.render(matcher);
                 if(rendered == null) continue;
                 mdText = rendered;
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -85,7 +98,7 @@ public class MDParser {
      * @return  用<p></p>包括之后的html语句
      */
     private static String paragraphRender(String html){
-        String regex = "^^(?!^<\\w+ *[^<>]*>).*";
+        String regex = "^(?!^<\\w+ *[^<>]*>).*";
         Pattern pattern = Pattern.compile(regex,Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(html);
         String rendered = new ParagraphRenderer().render(matcher);

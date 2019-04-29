@@ -1,10 +1,6 @@
 # MarkDown书写规范
 
 
-
-
-
-
 写文档好帮手，轻量级标记语言 Markdown
 
 # 概述
@@ -128,17 +124,42 @@ class Test{
     }
 ````
 
+```
+<html>
+    <head>
+    
+    </head>
+    
+    <body>
+    
+    
+    </body>
+</html>
+```
+`<html></html>`
+
+* * *
+***
+****
+---
+- - -
+
+***   ****
+** 
+
+
 ## 链接
 
-行内连接 [GitHub](https://github.com/) 的链接
+带title的行内连接 [GitHub](https://github.com/    "github") 的链接
 
-blank跳转链接[百度1](http://www.baidu.com/){:target="_blank"}    
+不带title的链接[百度一下](http://www.baidu.com/)    
+
+暂不支持指定跳转方式的链接[百度一下](  http://www.baidu.com/  "百度一下"  ){:target="_blank"}    
 
 
 ## 图片
 
-![shiyanlou logo](https://static.shiyanlou.com/img/logo_03.png)
+这里有一张图片![shiyanlou logo](https://static.shiyanlou.com/img/logo_03.png)
 
-![shiyanlou logo'logo'](https://static.shiyanlou.com/img/logo_03.png)
+这里有一张带链接的图片[   ![  shiyanlou logo   ](   https://static.shiyanlou.com/img/logo_03.png ) ]( http://www.baidu.com )
 
-[   ![  shiyanlou logo   ](   https://static.shiyanlou.com/img/logo_03.png ) ]( http://www.baidu.com )

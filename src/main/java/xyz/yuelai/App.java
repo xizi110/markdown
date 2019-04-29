@@ -3,6 +3,8 @@ package xyz.yuelai;
 import java.io.*;
 
 public class App {
+
+
     public static void main( String[] args ){
         String mdText = new App().readMDText();
         long begin = System.currentTimeMillis();

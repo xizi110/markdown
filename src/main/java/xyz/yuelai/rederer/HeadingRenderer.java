@@ -7,10 +7,11 @@ import java.util.regex.Matcher;
  */
 public class HeadingRenderer implements MDRenderer {
 
+    private StringBuffer result = new StringBuffer();
+
     @Override
     public String render(Matcher matcher) {
         StringBuilder sb = new StringBuilder();
-        String result = null;
         while (matcher.find()){
             String group = matcher.group().trim();
             String level_ = group.substring(0, group.indexOf(" "));
@@ -61,12 +62,11 @@ public class HeadingRenderer implements MDRenderer {
             // 如有结尾#，且可以去掉则也去掉
             group = group.replaceAll(" +#{1,6}$", "");
             sb.append(heading).append(group.trim()).append(heading_end).append("\r");
-            // 转换为html标签
-            result = matcher.replaceFirst(sb.toString());
-            // 重置解析文本
-            matcher.reset(result);
+
+            matcher.appendReplacement(result, sb.toString());
             sb.delete(0,sb.length());
         }
-        return result;
+        matcher.appendTail(result);
+        return result.toString();
     }
 }

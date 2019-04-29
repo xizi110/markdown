@@ -1,31 +1,45 @@
 package xyz.yuelai.rederer;
 
+import xyz.yuelai.util.RegexUtil;
+
 import java.util.regex.Matcher;
 
+/**
+ * 图片链接渲染器
+ */
 public class ImageLinkRenderer implements MDRenderer {
+
+    private StringBuffer result = new StringBuffer();
+
     @Override
     public String render(Matcher matcher) {
-        String result = null;
         while (matcher.find()){
             String group = matcher.group().trim();
+
             String alt;
             String src;
             String href;
-            String replacement = null;
-            src = group.substring(group.indexOf("(") + 1, group.indexOf(")")).trim();
+            String replacement = "";
+
+            src = RegexUtil.firstMatch("(?>\\() *[^\\(\\) ]+", group).substring(1).trim();
+            alt = RegexUtil.firstMatch("(?<=\\!\\[)[^\\[\\]]+", group).trim();
+
             if(group.startsWith("!")){ // 普通图片
-                alt = group.substring(group.indexOf("[") + 1, group.indexOf("]"));
-                replacement = String.format("<img alt = \"%s\" title = \"%s\" src = \"%s\"/>", alt,alt,src);
+
+                replacement = String.format("<img alt = \"%s\" src = \"%s\"/>", alt, src);
+
             }else if (group.startsWith("[")){ // 链接图片
-                alt = group.substring(group.indexOf("!") + 2, group.indexOf("]"));
-                href = group.substring(group.lastIndexOf("(") + 1,group.lastIndexOf(")")).trim();
-                replacement = String.format("<a href = \"%s\"><img alt = \"%s\" title = \"%s\" src = \"%s\"/></a>", href,alt,alt,src);
+
+                href = group.substring(group.lastIndexOf("]") + 1).trim();
+                replacement = String.format("<a href = \"%s\"><img alt = \"%s\" src = \"%s\"/></a>",
+                        href.substring(1,href.length() - 1).trim(), alt, src);
+
             }
-            if(replacement != null) {
-                result = matcher.replaceFirst(replacement);
-                matcher.reset(result);
-            }
+
+            matcher.appendReplacement(result, replacement);
         }
-        return result;
+
+        matcher.appendTail(result);
+        return result.toString();
     }
 }
