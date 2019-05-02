@@ -22,20 +22,11 @@ public class LinkRenderer implements MDRenderer {
 
             String text = RegexUtil.firstMatch("\\[.*\\]", group);
             String href = RegexUtil.firstMatch("(?>\\() *[^\\(\\) ]+", group);
-
             String title = RegexUtil.firstMatch(" \".*\"", group);
-
-
-            // 不包含title
-            if(title == null && href != null){
-                href = href.substring(1, href.length() - 1).trim();
-            }else if (title != null && href != null){   // 包含title
-                href = href.substring(1, href.indexOf(title)).trim();
-            }
 
             text = text == null ? "" : text.substring(1, text.length() - 1).trim();
             title = title == null ? "" : title.replace("\"", "").trim();
-            href = href == null ? "" : href;
+            href = href == null ? "" : href.substring(1).trim();
 
             String link = String.format("<a href=\"%s\" title=\"%s\">%s</a>", href, title, text);
 

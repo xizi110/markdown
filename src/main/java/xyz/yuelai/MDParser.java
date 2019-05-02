@@ -14,9 +14,12 @@ import java.util.regex.Pattern;
 public class MDParser {
 
     /**
-     * 各种标签的(渲染器-正则表达式)键值对
+     * 各种标签的(渲染器-正则表达式)键值对。
+     *
+     * 个别标签的渲染顺序可能会影响最终的渲染结果
+     * 所以选择LinkedHashMap来保证渲染顺序
      */
-    private static final Map<Class<? extends MDRenderer>, String> regex = new HashMap<Class<? extends MDRenderer>, String>(){{
+    private static final Map<Class<? extends MDRenderer>, String> regex = new LinkedHashMap<Class<? extends MDRenderer>, String>(){{
 
         /*
          * H1~H6标题，"### 标题3"或"### 标题3 ###"
@@ -61,6 +64,18 @@ public class MDParser {
          * *** 或 --- 或 * * * 或 - - -
          */
         put(HorizontalRenderer.class, "^(\\*|\\-)[\\* *\\-]{2,}$");
+
+        /*
+         * 粗体<Strong></Strong>被包括
+         * **粗体**或者__粗体__
+         */
+        put(StrongRenderer.class, "(\\*{2}|_{2})[^\\*]{1}.+?\\1");
+
+        /*
+         * 斜体强调,被<em></em>包括
+         * *斜体*或者_斜体_
+         */
+        put(EmphasisRenderer.class, "(\\*|_)[^\\*]{1}.+?\\1");
     }};
 
     /**
