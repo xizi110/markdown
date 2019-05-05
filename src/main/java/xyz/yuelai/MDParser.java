@@ -190,7 +190,7 @@ public class MDParser {
      * @param html  经过所有渲染器渲染后的html语句
      * @return  用<p></p>包括之后的html语句
      */
-    private static String paragraphRender(String html){
+    private String paragraphRender(String html){
         String regex = "^(?!^<\\w+ *[^<>]*>).*";
         Pattern pattern = Pattern.compile(regex,Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(html);
