@@ -110,6 +110,19 @@ class Test{
 ```
 
 ```
+class A{
+
+
+public static void main(){
+
+}
+
+}
+
+
+```
+
+```
 class Test{
     public static void main()
     {
@@ -168,3 +181,73 @@ class Test{
 **asas*asas**
 
 ***asas_***
+
+*    1
+ 2345667
+
+
+
+* red
+laslalsllalslas
+* green
+* blue
+asasas
+*    2
+-    1
+-    2
+* 1
+* 2
++    1
++    2
++ 3
+* 3
+*  5
+
+
+
+0.   1
+
+1.   2
+
+2.   3
+
+1.   4
+
+123. 123
+
+* > 121212
+121212
+1212
+1212
+1212
+
+1. asa
+> 121212
+> 2. asasa
+> 1. asasa
+
+asasasa
+
+asasasas
+
+>asas
+asasa
+
+* asasas
+asas
+asas
+
+asas            
+                          
+    
+    print
+    
+    asasa
+    
+    
+
+    
+    asas
+
+    asasa
+asas          

@@ -1,25 +1,38 @@
 package xyz.yuelai;
 
 import java.io.*;
+import java.net.URISyntaxException;
 
 public class App {
 
-
     public static void main( String[] args ){
-        App app = new App();
-        // 读取markdown文件
-        String mdText = app.readMDText();
+        File file = null;
+        try {
+            file = new File(App.class.getResource("/test.md").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        try {
 
-        long begin = System.currentTimeMillis();
-        // 开始解析
-        String body = MDParser.conventHTML(mdText);
-        System.out.println(System.currentTimeMillis() - begin);
+            MDParser parser = new MDParser(file);
 
-        // 输出为html文件
-        app.outPutHTML(body);
+            long begin = System.currentTimeMillis();
+            String body = parser.conventHTML();
+            System.out.println(System.currentTimeMillis() - begin);
+
+            System.out.println(body);
+//            outPutHTML(body);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private void outPutHTML(String body){
+    /**
+     * 输出到html文件
+     * @param body
+     */
+    private static void outPutHTML(String body){
         try(FileWriter fw = new FileWriter("text.html");BufferedWriter writer = new BufferedWriter(fw)) {
             String s = String.format("<!doctype html><html><head><meta charset=\"UTF-8\"></head><body>%s</body></html>", body);
             writer.write(s);
@@ -30,17 +43,5 @@ public class App {
 
     }
 
-    private String readMDText(){
-        StringBuilder sb = new StringBuilder();
-        try(BufferedReader reader = new BufferedReader(new FileReader(new File(getClass().getResource("/test.md").getFile())))) {
 
-            String line;
-            while ((line = reader.readLine()) != null){
-                sb.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
 }

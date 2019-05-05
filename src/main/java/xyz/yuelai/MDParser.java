@@ -2,6 +2,7 @@ package xyz.yuelai;
 
 import xyz.yuelai.rederer.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +13,65 @@ import java.util.regex.Pattern;
  *
  */
 public class MDParser {
+
+    private List<String> block = new LinkedList<>();
+
+    public MDParser(File file) throws IOException {
+
+        // 空指针
+        if(file == null){
+            throw new NullPointerException();
+        }
+
+        // 文件不存在
+        if(!file.exists()){
+            throw new FileNotFoundException();
+        }
+        FileReader fileReader = new FileReader(file);
+        readMDText(fileReader);
+    }
+
+    public MDParser(FileReader reader){
+        // 空指针
+        if(reader == null){
+            throw new NullPointerException();
+        }
+        readMDText(reader);
+    }
+
+    /**
+     * 读取markdown文本
+     * 它会返回一个list，里面包含被空行分隔文本段，由markdown文本的特性，我么们对markdown文本进行分段处理
+     * 分段原则，是根据回车也就是空白行(不包含空格或制表符)进行分割的。被分割的每一块，是一个整体，对这些文本块
+     * 进行下一步的具体标签解析
+     * @return  markdown文本各个文本块
+     * @param reader  markdown文件
+     */
+    private void readMDText(Reader reader) {
+        StringBuilder sb = new StringBuilder();
+        try(BufferedReader bufferedReader = new BufferedReader(reader)) {
+            String line;
+            boolean isInCode = false;
+            while ((line = bufferedReader.readLine()) != null){
+                // 判断是否进入了代码段
+                if(line.startsWith("```") && !line.substring(3).endsWith("```")){
+                    isInCode = !isInCode;
+                }
+                // 如果是空白行并且不在代码段内，说明就该在此进行分割
+                // 如果是空白行但在代码段内，则按正常文本处理
+                if(line.length() == 0 && !isInCode){
+                    if(sb.length() > 0){
+                        block.add(sb.toString());
+                        sb.delete(0, sb.length());
+                    }
+                    continue;
+                }
+                sb.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 各种标签的(渲染器-正则表达式)键值对。
@@ -29,7 +89,7 @@ public class MDParser {
         /*
          * 空白行，一次回车一个空白行
          */
-        put(BlankLineRenderer.class, "^\\n");
+//        put(BlankLineRenderer.class, "^\\n");
 
         /*
          * 行内代码块，嵌入文本中
@@ -76,14 +136,32 @@ public class MDParser {
          * *斜体*或者_斜体_
          */
         put(EmphasisRenderer.class, "(\\*|_)[^\\*]{1}.+?\\1");
+
+        /*
+         * 无序列表,
+         * 匹配以下标记：
+         * * list
+         * - list
+         * + list
+         */
+        put(UnOrderListsRenderer.class, "[\\*\\-\\+] +.+[\\s\\S]+");
     }};
+
+    public String conventHTML(){
+        StringBuilder sb = new StringBuilder();
+        for (String s : block) {
+            String html = conventHTML(s);
+            sb.append(html);
+        }
+        return sb.toString();
+    }
 
     /**
      * 对markdown文本进行解析，并调用适当的渲染器进行渲染
      * @param mdText    初始markdown文本
      * @return  转换问html的文本
      */
-    public static String conventHTML(String mdText){
+    private String conventHTML(String mdText){
 
         Set<Map.Entry<Class<? extends MDRenderer>, String>> entries = regex.entrySet();
 

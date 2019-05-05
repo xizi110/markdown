@@ -13,7 +13,6 @@ public class StrongRenderer implements MDRenderer {
     public String render(Matcher matcher) {
         while (matcher.find()){
             String group = matcher.group();
-            System.out.println(group);
             String s = String.format("<Strong>%s</Strong>", group.substring(2, group.length() - 2));
             matcher.appendReplacement(result, s);
         }
